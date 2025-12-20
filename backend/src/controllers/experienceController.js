@@ -5,7 +5,7 @@ exports.getExperience = async (req, res) => {
     const experiences = await Experience.find();
     res.status(200).json(experiences);
   } catch (error) {
-    console.error("Error fetching experience:", error);
+    console.error("Experience fetch error:", error);
     res.status(500).json({ message: "Failed to fetch experience" });
   }
 };
@@ -15,7 +15,7 @@ exports.createExperience = async (req, res) => {
     const experience = await Experience.create(req.body);
     res.status(201).json(experience);
   } catch (error) {
-    console.error("Error creating experience:", error);
+    console.error("Experience create error:", error);
     res.status(500).json({ message: "Failed to create experience" });
   }
 };
