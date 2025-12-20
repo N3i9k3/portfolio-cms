@@ -3,10 +3,14 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+
+  server: {
+    host: true,
+    allowedHosts: 'all'
+  },
+
   preview: {
     host: true,
-    allowedHosts: [
-      'portfolio-cms-production-2886.up.railway.app'
-    ]
+    allowedHosts: 'all'
   }
 })
