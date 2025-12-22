@@ -4,7 +4,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   preview: {
-    allowedHosts: "all",
+    allowedHosts: [
+      "portfolio-cms-production-80c6.up.railway.app",
+    ],
   },
 });
 
