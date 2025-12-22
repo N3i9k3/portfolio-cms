@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   preview: {
     allowedHosts: [
-      "portfolio-cms-production-80c6.up.railway.app",
+      "all",
     ],
   },
 });
