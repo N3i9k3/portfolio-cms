@@ -1,0 +1,7 @@
+export default function Footer() {
+  return (
+    <footer className="p-6 text-center border-t mt-12">
+      © {new Date().getFullYear()} My Portfolio
+    </footer>
+  );
+}
