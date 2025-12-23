@@ -1,33 +1,29 @@
 import React, { useState } from "react";
+import api from "../services/api"; // axios instance with baseURL
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const res = await api.post("/auth/login", { email, password });
-
-      // ✅ Save token and user to localStorage
+      const res = await api.post("/auth/register", { email, password });
+      // Save token & user
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // ✅ Redirect to dashboard
-      navigate("/dashboard");
+      navigate("/dashboard"); // redirect to dashboard
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.error || "Login failed");
+      setError(err.response?.data?.error || "Registration failed");
     }
   };
 
   return (
     <div className="max-w-md mx-auto mt-20 p-4 border rounded">
-      <h1 className="text-2xl font-bold mb-4">Admin Login</h1>
-
+      <h1 className="text-2xl font-bold mb-4">Register</h1>
       <input
         type="email"
         placeholder="Email"
@@ -35,7 +31,6 @@ export default function Login() {
         onChange={(e) => setEmail(e.target.value)}
         className="border p-2 w-full mb-2"
       />
-
       <input
         type="password"
         placeholder="Password"
@@ -43,14 +38,12 @@ export default function Login() {
         onChange={(e) => setPassword(e.target.value)}
         className="border p-2 w-full mb-2"
       />
-
       {error && <p className="text-red-600 mb-2">{error}</p>}
-
       <button
-        onClick={handleLogin}
+        onClick={handleRegister}
         className="bg-black text-white px-4 py-2 w-full"
       >
-        Login
+        Register
       </button>
     </div>
   );

@@ -10,6 +10,7 @@ import Blogs from "./pages/Blogs";
 import Testimonials from "./pages/Testimonials";
 import Experience from "./pages/Experience";
 import Services from "./pages/Services";
+import Register from "./pages/Register";
 
 import ProtectedRoute from "./utils/ProtectedRoute";
 
@@ -41,9 +42,11 @@ function App() {
         <Route path="/testimonials" element={<ProtectedRoute><Testimonials /></ProtectedRoute>} />
         <Route path="/experience" element={<ProtectedRoute><Experience /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+        <Route path="/register" element={<ProtectedRoute><Register /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
+
