@@ -1,30 +1,63 @@
-const prisma = require("../config/db"); // Your Prisma client
-const { comparePassword } = require("../utils/hash");
-const { generateToken } = require("../utils/jwt");
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
+/* ================= REGISTER ================= */
+exports.register = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "All fields required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.create({
+      email,
+      password: hashedPassword,
+      role: "user",
+    });
+
+    res.status(201).json({ message: "User registered successfully ✅" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/* ================= LOGIN ================= */
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !password)
-    return res.status(400).json({ message: "Missing credentials" });
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(401).json({ error: "Invalid credentials" });
 
-  const user = await prisma.user.findUnique({ where: { email } });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(401).json({ error: "Invalid credentials" });
 
-  if (!user)
-    return res.status(401).json({ message: "Invalid email or password" });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-  const isMatch = await comparePassword(password, user.password);
-
-  if (!isMatch)
-    return res.status(401).json({ message: "Invalid email or password" });
-
-  const token = generateToken({
-    id: user.id,
-    role: user.role,
-  });
-
-  res.json({
-    token,
-    user: { id: user.id, email: user.email },
-  });
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
