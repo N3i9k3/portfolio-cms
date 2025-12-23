@@ -2,31 +2,26 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
-export default function Login() {
+export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
-      const res = await api.post("/auth/login", { email, password });
-
-      // ✅ Save token and user to localStorage
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      // ✅ Redirect to dashboard
-      navigate("/dashboard");
+      const res = await api.post("/auth/register", { email, password });
+      alert(res.data.message); // "User registered successfully ✅"
+      navigate("/login");      // redirect to login page after signup
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || "Login failed");
+      setError(err.response?.data?.error || "Signup failed");
     }
   };
 
   return (
     <div className="max-w-md mx-auto mt-20 p-4 border rounded">
-      <h1 className="text-2xl font-bold mb-4">Admin Login</h1>
+      <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
 
       <input
         type="email"
@@ -47,21 +42,11 @@ export default function Login() {
       {error && <p className="text-red-600 mb-2">{error}</p>}
 
       <button
-        onClick={handleLogin}
-        className="bg-black text-white px-4 py-2 w-full"
+        onClick={handleSignup}
+        className="bg-green-600 text-white px-4 py-2 w-full"
       >
-        Login
+        Sign Up
       </button>
-      <p className="mt-2 text-sm">
-  Don't have an account?{" "}
-  <span
-    className="text-blue-600 cursor-pointer"
-    onClick={() => navigate("/signup")}
-  >
-    Sign Up
-  </span>
-</p>
-
     </div>
   );
 }
