@@ -1,5 +1,6 @@
-import React from "react"; 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
@@ -15,8 +16,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+
         <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/about" element={<About />} />
         <Route path="/skills" element={<Skills />} />
         <Route path="/projects" element={<Projects />} />
@@ -28,5 +31,7 @@ function App() {
     </BrowserRouter>
   );
 }
+
+
 
 export default App;
