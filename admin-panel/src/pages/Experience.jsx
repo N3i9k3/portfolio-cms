@@ -1,69 +1,142 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../services/api";
 import Layout from "../components/Layout";
 
 export default function Experience() {
-  const [items, setItems] = useState([]);
-  const [role, setRole] = useState("");
-  const [company, setCompany] = useState("");
+  const [experiences, setExperiences] = useState([]);
+  const [form, setForm] = useState({
+    company: "",
+    role: "",
+    duration: "",
+    description: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
-    const res = await api.get("/experience");
-    setItems(res.data);
-  };
-
+  // Fetch experiences
   useEffect(() => {
-    fetchData();
+    const fetchExperiences = async () => {
+      try {
+        const res = await api.get("/experience");
+        setExperiences(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch experience", err);
+      }
+    };
+
+    fetchExperiences();
   }, []);
 
-  const addItem = async () => {
-    if (!role || !company) return;
-    await api.post("/experience", { role, company });
-    setRole("");
-    setCompany("");
-    fetchData();
+  // Handle input
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const deleteItem = async (id) => {
-    await api.delete(`/experience/${id}`);
-    fetchData();
+  // Add experience
+  const addExperience = async () => {
+    const { company, role, duration, description } = form;
+
+    if (!company || !role || !duration) {
+      return alert("Company, role and duration are required");
+    }
+
+    try {
+      setLoading(true);
+      const res = await api.post("/experience", form);
+      setExperiences([res.data, ...experiences]);
+      setForm({ company: "", role: "", duration: "", description: "" });
+    } catch (err) {
+      alert("Failed to add experience ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete experience
+  const deleteExperience = async (id) => {
+    if (!confirm("Delete this experience?")) return;
+
+    try {
+      await api.delete(`/experience/${id}`);
+      setExperiences(experiences.filter((e) => e.id !== id));
+    } catch (err) {
+      alert("Failed to delete experience ❌");
+    }
   };
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-4">Experience</h1>
+      <h1 className="text-2xl font-bold mb-6">Experience</h1>
 
-      <input
-        className="border p-2 w-full mb-2"
-        placeholder="Role"
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-      />
+      {/* Add Experience */}
+      <div className="bg-white p-4 rounded shadow mb-6 space-y-3">
+        <input
+          name="company"
+          value={form.company}
+          onChange={handleChange}
+          placeholder="Company name"
+          className="border p-2 w-full rounded"
+        />
 
-      <input
-        className="border p-2 w-full mb-2"
-        placeholder="Company"
-        value={company}
-        onChange={(e) => setCompany(e.target.value)}
-      />
+        <input
+          name="role"
+          value={form.role}
+          onChange={handleChange}
+          placeholder="Role / Position"
+          className="border p-2 w-full rounded"
+        />
 
-      <button onClick={addItem} className="bg-black text-white px-4 py-2">
-        Add Experience
-      </button>
+        <input
+          name="duration"
+          value={form.duration}
+          onChange={handleChange}
+          placeholder="Duration (e.g. Jan 2024 - Present)"
+          className="border p-2 w-full rounded"
+        />
 
-      <ul className="mt-6">
-        {items.map((exp) => (
-          <li key={exp.id} className="mb-4 border-b pb-2">
-            {exp.role} @ {exp.company}
+        <textarea
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          placeholder="Description (optional)"
+          className="border p-2 w-full rounded h-28"
+        />
+
+        <button
+          onClick={addExperience}
+          disabled={loading}
+          className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
+        >
+          {loading ? "Saving..." : "Add Experience"}
+        </button>
+      </div>
+
+      {/* Experience List */}
+      <div className="space-y-4">
+        {experiences.map((exp) => (
+          <div
+            key={exp.id}
+            className="bg-white p-4 rounded shadow flex justify-between"
+          >
+            <div>
+              <h3 className="font-semibold text-lg">
+                {exp.role} — {exp.company}
+              </h3>
+              <p className="text-sm text-gray-500">{exp.duration}</p>
+              {exp.description && (
+                <p className="text-gray-700 mt-1">{exp.description}</p>
+              )}
+            </div>
+
             <button
-              onClick={() => deleteItem(exp.id)}
-              className="text-red-600 ml-4"
+              onClick={() => deleteExperience(exp.id)}
+              className="text-red-600 font-bold"
             >
-              Delete
+              ✕
             </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </Layout>
   );
 }
+

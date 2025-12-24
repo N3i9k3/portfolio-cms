@@ -1,71 +1,118 @@
-import React, { useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";
 import api from "../services/api";
 import Layout from "../components/Layout";
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [form, setForm] = useState({
+    title: "",
+    content: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  const fetchBlogs = async () => {
-    const res = await api.get("/blogs");
-    setBlogs(res.data);
-  };
-
+  // Fetch blogs
   useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await api.get("/blogs");
+        setBlogs(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch blogs", err);
+      }
+    };
+
     fetchBlogs();
   }, []);
 
-  const addBlog = async () => {
-    if (!title || !content) return;
-    await api.post("/blogs", { title, content });
-    setTitle("");
-    setContent("");
-    fetchBlogs();
+  // Handle input
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Add blog
+  const addBlog = async () => {
+    if (!form.title.trim() || !form.content.trim()) {
+      return alert("Title and content are required");
+    }
+
+    try {
+      setLoading(true);
+      const res = await api.post("/blogs", form);
+      setBlogs([res.data, ...blogs]);
+      setForm({ title: "", content: "" });
+    } catch (err) {
+      alert("Failed to add blog ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete blog
   const deleteBlog = async (id) => {
-    await api.delete(`/blogs/${id}`);
-    fetchBlogs();
+    if (!confirm("Delete this blog?")) return;
+
+    try {
+      await api.delete(`/blogs/${id}`);
+      setBlogs(blogs.filter((b) => b.id !== id));
+    } catch (err) {
+      alert("Failed to delete blog ❌");
+    }
   };
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-4">Blogs</h1>
+      <h1 className="text-2xl font-bold mb-6">Blogs</h1>
 
-      <input
-        className="border p-2 w-full mb-2"
-        placeholder="Blog title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+      {/* Add Blog */}
+      <div className="bg-white p-4 rounded shadow mb-6 space-y-3">
+        <input
+          name="title"
+          value={form.title}
+          onChange={handleChange}
+          placeholder="Blog title"
+          className="border p-2 w-full rounded"
+        />
 
-      <textarea
-        className="border p-2 w-full mb-2"
-        placeholder="Blog content"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
+        <textarea
+          name="content"
+          value={form.content}
+          onChange={handleChange}
+          placeholder="Blog content"
+          className="border p-2 w-full rounded h-32"
+        />
 
-      <button onClick={addBlog} className="bg-black text-white px-4 py-2">
-        Add Blog
-      </button>
+        <button
+          onClick={addBlog}
+          disabled={loading}
+          className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
+        >
+          {loading ? "Publishing..." : "Publish Blog"}
+        </button>
+      </div>
 
-      <ul className="mt-6">
-        {blogs.map((b) => (
-          <li key={b.id} className="mb-4 border-b pb-2">
-            <h3 className="font-bold">{b.title}</h3>
-            <p>{b.content}</p>
+      {/* Blog List */}
+      <div className="space-y-4">
+        {blogs.map((blog) => (
+          <div
+            key={blog.id}
+            className="bg-white p-4 rounded shadow flex justify-between"
+          >
+            <div>
+              <h3 className="font-semibold text-lg">{blog.title}</h3>
+              <p className="text-gray-600 text-sm line-clamp-3">
+                {blog.content}
+              </p>
+            </div>
+
             <button
-              onClick={() => deleteBlog(b.id)}
-              className="text-red-600"
+              onClick={() => deleteBlog(blog.id)}
+              className="text-red-600 font-bold"
             >
-              Delete
+              ✕
             </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </Layout>
   );
 }
