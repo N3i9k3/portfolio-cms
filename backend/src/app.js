@@ -5,12 +5,14 @@ const path = require("path");
 const app = express();
 
 /* -------------------- MIDDLEWARE -------------------- */
+const cors = require("cors");
+
 app.use(
   cors({
     origin: [
-      "https://admin-panel-one-kohl.vercel.app",
-      "https://admin-panel-c9gvdil03-nikita-mehares-projects.vercel.app",
-      "http://localhost:5173",
+      "http://localhost:5173", // for local dev
+      "https://admin-panel-rfm0ikkwg-nikita-mehares-projects.vercel.app", // your current admin panel
+      "https://admin-panel-one-kohl.vercel.app" // if you also want the old alias
     ],
     credentials: true,
   })
