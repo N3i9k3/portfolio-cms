@@ -9,13 +9,12 @@ app.use(
   cors({
     origin: [
       "https://admin-panel-one-kohl.vercel.app",
-      "https://admin-panel-nr1645hzt-nikita-mehares-projects.vercel.app",
-      "http://localhost:5173"
+      "https://admin-panel-c9gvdil03-nikita-mehares-projects.vercel.app",
+      "http://localhost:5173",
     ],
     credentials: true,
   })
 );
-
 
 app.use(express.json());
 
