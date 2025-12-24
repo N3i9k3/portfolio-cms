@@ -1,24 +1,23 @@
 const express = require("express");
-const cors = require("cors");
+const cors = require("cors");   // ✅ only one
 const path = require("path");
 
 const app = express();
 
 /* -------------------- MIDDLEWARE -------------------- */
-const cors = require("cors");
-
 app.use(
   cors({
     origin: [
-      "http://localhost:5173", // for local dev
-      "https://admin-panel-rfm0ikkwg-nikita-mehares-projects.vercel.app", // your current admin panel
-      "https://admin-panel-one-kohl.vercel.app" // if you also want the old alias
+      "https://admin-panel-one-kohl.vercel.app",
+      "https://admin-panel-rfm0ikkwg-nikita-mehares-projects.vercel.app",
+      "http://localhost:5173"
     ],
     credentials: true,
   })
 );
 
 app.use(express.json());
+
 
 
 /* Serve uploaded files */
