@@ -7,12 +7,14 @@ export default function Skills() {
   const [newSkill, setNewSkill] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch skills
+  /* -------------------- FETCH SKILLS -------------------- */
   useEffect(() => {
     const fetchSkills = async () => {
       try {
         const res = await api.get("/skills");
-        setSkills(res.data?.skills || []);
+
+        // Ensure consistent object structure
+        setSkills(res.data.skills || []);
       } catch (err) {
         console.error("Failed to fetch skills", err);
       }
@@ -21,23 +23,36 @@ export default function Skills() {
     fetchSkills();
   }, []);
 
-  // Add skill
+  /* -------------------- ADD SKILL (FRONTEND ONLY) -------------------- */
   const addSkill = () => {
     if (!newSkill.trim()) return;
-    setSkills([...skills, newSkill.trim()]);
+
+    setSkills([
+      ...skills,
+      {
+        id: Date.now(), // ✅ temporary unique key
+        name: newSkill.trim(),
+      },
+    ]);
+
     setNewSkill("");
   };
 
-  // Remove skill
+  /* -------------------- REMOVE SKILL -------------------- */
   const removeSkill = (index) => {
     setSkills(skills.filter((_, i) => i !== index));
   };
 
-  // Save skills
+  /* -------------------- SAVE SKILLS -------------------- */
   const saveSkills = async () => {
     try {
       setLoading(true);
-      await api.put("/skills", { skills });
+
+      // Send only skill names to backend
+      const skillNames = skills.map((skill) => skill.name);
+
+      await api.put("/skills", { skills: skillNames });
+
       alert("Skills updated successfully ✅");
     } catch (err) {
       console.error("Failed to save skills", err);
@@ -71,10 +86,10 @@ export default function Skills() {
       <div className="flex flex-wrap gap-2 mb-6">
         {skills.map((skill, index) => (
           <span
-            key={index}
+            key={skill.id || index} // ✅ stable key
             className="bg-gray-200 px-3 py-1 rounded flex items-center gap-2"
           >
-            {skill}
+            {skill.name}
             <button
               onClick={() => removeSkill(index)}
               className="text-red-600 font-bold"
