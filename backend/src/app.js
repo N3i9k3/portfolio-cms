@@ -1,26 +1,41 @@
 const express = require("express");
-const cors = require("cors");   // ✅ only one
+const cors = require("cors");
 const path = require("path");
 
 const app = express();
 
-/* -------------------- MIDDLEWARE -------------------- */
-app.use(
-  cors({
-    origin: [
-      "https://admin-panel-one-kohl.vercel.app",
-      " https://admin-panel-7hhrschox-nikita-mehares-projects.vercel.app",
-      "http://localhost:5173"
-    ],
-    credentials: true,
-  })
-);
+/* -------------------- CORS CONFIG -------------------- */
+const allowedOrigins = [
+  "https://admin-panel-one-kohl.vercel.app",
+  "https://admin-panel-7hhrschox-nikita-mehares-projects.vercel.app",
+  "http://localhost:5173",
+];
+
+// Allow all Vercel preview deployments
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app")
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // ✅ VERY IMPORTANT
 
 app.use(express.json());
 
-
-
-/* Serve uploaded files */
+/* -------------------- STATIC FILES -------------------- */
 app.use(
   "/uploads",
   express.static(path.join(process.cwd(), "uploads"))
@@ -47,7 +62,7 @@ app.use("/skills", require("./routes/skillRoutes"));
 app.use("/upload", require("./routes/uploadRoutes"));
 app.use("/contact", require("./routes/contactRoutes"));
 
-/* -------------------- PROTECTED TEST ROUTE -------------------- */
+/* -------------------- PROTECTED TEST -------------------- */
 const { protect } = require("./middleware/authMiddleware");
 
 app.get("/admin/test", protect, (req, res) => {
@@ -57,15 +72,12 @@ app.get("/admin/test", protect, (req, res) => {
   });
 });
 
-/* -------------------- 404 HANDLER -------------------- */
+/* -------------------- 404 -------------------- */
 app.use((req, res) => {
-  res.status(404).json({
-    error: "Route not found ❌",
-  });
+  res.status(404).json({ error: "Route not found ❌" });
 });
 
 module.exports = app;
-
 
 
 
