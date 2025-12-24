@@ -5,8 +5,18 @@ const path = require("path");
 const app = express();
 
 /* -------------------- MIDDLEWARE -------------------- */
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://admin-panel-one-kohl.vercel.app",
+      "http://localhost:5173",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
+
 
 /* Serve uploaded files */
 app.use(
