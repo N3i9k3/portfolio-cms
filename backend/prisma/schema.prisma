@@ -27,10 +27,14 @@ model Skill {
 }
 
 model Project {
-  id          Int    @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   title       String
   description String
+  link        String?   // ✅ optional
+  image       String?   // ✅ optional
+  createdAt   DateTime @default(now())
 }
+
 
 model Blog {
   id    Int    @id @default(autoincrement())
