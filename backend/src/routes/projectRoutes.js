@@ -16,13 +16,13 @@ router.get("/", async (req, res) => {
 
 // Add a new project
 router.post("/", async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, link, image } = req.body;
   if (!title || !description)
     return res.status(400).json({ error: "Title and description required" });
 
   try {
     const project = await prisma.project.create({
-      data: { title, description },
+      data: { title, description, link, image },
     });
     res.json(project);
   } catch (err) {
@@ -32,3 +32,4 @@ router.post("/", async (req, res) => {
 });
 
 module.exports = router;
+
