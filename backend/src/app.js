@@ -1,28 +1,24 @@
 const express = require("express");
-const cors = require("cors"); // ✅ declared only once
+const cors = require("cors");   // ✅ only one
 const path = require("path");
 
 const app = express();
 
-/* -------------------- CORS CONFIG (VERY IMPORTANT) -------------------- */
+/* -------------------- MIDDLEWARE -------------------- */
 app.use(
   cors({
     origin: [
       "https://admin-panel-one-kohl.vercel.app",
-      "https://admin-panel-rfm0ikkwg-nikita-mehares-projects.vercel.app",
-      "http://localhost:5173",
+      " https://admin-panel-7hhrschox-nikita-mehares-projects.vercel.app",
+      "http://localhost:5173"
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-/* ✅ Explicitly handle preflight */
-app.options("*", cors());
-
-/* -------------------- MIDDLEWARE -------------------- */
 app.use(express.json());
+
+
 
 /* Serve uploaded files */
 app.use(
@@ -69,4 +65,7 @@ app.use((req, res) => {
 });
 
 module.exports = app;
+
+
+
 
