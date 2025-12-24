@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 router.get("/", async (req, res) => {
   try {
     const projects = await prisma.project.findMany();
-    res.json({ projects });
+    res.json(projects); // send array directly
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -31,5 +31,16 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+// Delete a project
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.project.delete({ where: { id: parseInt(id) } });
+    res.json({ message: "Project deleted ✅" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete project" });
+  }
+});
 
+module.exports = router;
