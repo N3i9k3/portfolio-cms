@@ -1,39 +1,41 @@
 const express = require("express");
-const { PrismaClient } = require("@prisma/client");
-
 const router = express.Router();
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { protect } = require("../middleware/authMiddleware");
 
-// GET About
+/* GET About */
 router.get("/", async (req, res) => {
   try {
     const about = await prisma.about.findFirst();
     res.json(about || { content: "" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch About" });
+    res.status(500).json({ error: "Failed to fetch about" });
   }
 });
 
-// POST About
-router.post("/", async (req, res) => {
+/* UPDATE About */
+router.put("/", protect, async (req, res) => {
   const { content } = req.body;
-  if (!content) return res.status(400).json({ error: "Content is required" });
 
   try {
-    let about = await prisma.about.findFirst();
-    if (about) {
-      about = await prisma.about.update({
-        where: { id: about.id },
+    const existing = await prisma.about.findFirst();
+
+    if (existing) {
+      await prisma.about.update({
+        where: { id: existing.id },
         data: { content },
       });
     } else {
-      about = await prisma.about.create({ data: { content } });
+      await prisma.about.create({
+        data: { content },
+      });
     }
-    res.json(about);
+
+    res.json({ message: "About updated successfully ✅" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error saving About" });
+    res.status(500).json({ error: "Failed to update about" });
   }
 });
 
