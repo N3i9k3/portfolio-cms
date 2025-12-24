@@ -5,45 +5,30 @@ const prisma = new PrismaClient();
 
 // Get all projects
 router.get("/", async (req, res) => {
-  const projects = await prisma.project.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(projects);
-});
-
-// Create project
-router.post("/", async (req, res) => {
-  const { title, description, link, image } = req.body;
-
-  if (!title) {
-    return res.status(400).json({ error: "Title is required" });
+  try {
+    const projects = await prisma.project.findMany();
+    res.json({ projects });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const project = await prisma.project.create({
-    data: { title, description, link, image },
-  });
-
-  res.json(project);
 });
 
-// Update project
-router.put("/:id", async (req, res) => {
-  const id = Number(req.params.id);
+// Add a new project
+router.post("/", async (req, res) => {
+  const { title, description } = req.body;
+  if (!title || !description)
+    return res.status(400).json({ error: "Title and description required" });
 
-  const project = await prisma.project.update({
-    where: { id },
-    data: req.body,
-  });
-
-  res.json(project);
-});
-
-// Delete project
-router.delete("/:id", async (req, res) => {
-  const id = Number(req.params.id);
-
-  await prisma.project.delete({ where: { id } });
-  res.json({ success: true });
+  try {
+    const project = await prisma.project.create({
+      data: { title, description },
+    });
+    res.json(project);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;

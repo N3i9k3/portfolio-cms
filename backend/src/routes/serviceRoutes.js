@@ -3,45 +3,32 @@ const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Get services
+// Get all services
 router.get("/", async (req, res) => {
-  const services = await prisma.service.findMany();
-  res.json(services);
-});
-
-// Create service
-router.post("/", async (req, res) => {
-  const { title, description, icon } = req.body;
-
-  if (!title) {
-    return res.status(400).json({ error: "Title is required" });
+  try {
+    const services = await prisma.service.findMany();
+    res.json({ services });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const service = await prisma.service.create({
-    data: { title, description, icon },
-  });
-
-  res.json(service);
 });
 
-// Update service
-router.put("/:id", async (req, res) => {
-  const id = Number(req.params.id);
+// Add a new service
+router.post("/", async (req, res) => {
+  const { title, description } = req.body;
+  if (!title || !description)
+    return res.status(400).json({ error: "Title and description required" });
 
-  const service = await prisma.service.update({
-    where: { id },
-    data: req.body,
-  });
-
-  res.json(service);
-});
-
-// Delete service
-router.delete("/:id", async (req, res) => {
-  const id = Number(req.params.id);
-
-  await prisma.service.delete({ where: { id } });
-  res.json({ success: true });
+  try {
+    const service = await prisma.service.create({
+      data: { title, description },
+    });
+    res.json(service);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;
