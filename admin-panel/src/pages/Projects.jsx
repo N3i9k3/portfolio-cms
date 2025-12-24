@@ -17,7 +17,7 @@ export default function Projects() {
     const fetchProjects = async () => {
       try {
         const res = await api.get("/projects");
-        setProjects(res.data || []);
+        setProjects(res.data.projects || []); // ✅ Access projects array inside object
       } catch (err) {
         console.error("Failed to fetch projects", err);
       }
@@ -38,9 +38,10 @@ export default function Projects() {
     try {
       setLoading(true);
       const res = await api.post("/projects", form);
-      setProjects([res.data, ...projects]);
+      setProjects([res.data, ...projects]); // Add new project to list
       setForm({ title: "", description: "", link: "", image: "" });
     } catch (err) {
+      console.error(err);
       alert("Failed to add project ❌");
     } finally {
       setLoading(false);
@@ -55,6 +56,7 @@ export default function Projects() {
       await api.delete(`/projects/${id}`);
       setProjects(projects.filter((p) => p.id !== id));
     } catch (err) {
+      console.error(err);
       alert("Failed to delete project ❌");
     }
   };
@@ -108,33 +110,38 @@ export default function Projects() {
 
       {/* Projects List */}
       <div className="space-y-4">
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            className="bg-white p-4 rounded shadow flex justify-between"
-          >
-            <div>
-              <h3 className="font-semibold text-lg">{project.title}</h3>
-              <p className="text-gray-600">{project.description}</p>
-              {project.link && (
-                <a
-                  href={project.link}
-                  target="_blank"
-                  className="text-blue-600 text-sm"
-                >
-                  {project.link}
-                </a>
-              )}
-            </div>
-
-            <button
-              onClick={() => deleteProject(project.id)}
-              className="text-red-600 font-bold"
+        {projects.length > 0 ? (
+          projects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-white p-4 rounded shadow flex justify-between"
             >
-              ✕
-            </button>
-          </div>
-        ))}
+              <div>
+                <h3 className="font-semibold text-lg">{project.title}</h3>
+                <p className="text-gray-600">{project.description}</p>
+                {project.link && (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 text-sm"
+                  >
+                    {project.link}
+                  </a>
+                )}
+              </div>
+
+              <button
+                onClick={() => deleteProject(project.id)}
+                className="text-red-600 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No projects yet.</p>
+        )}
       </div>
     </Layout>
   );
