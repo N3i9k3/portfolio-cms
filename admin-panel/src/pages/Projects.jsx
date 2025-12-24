@@ -14,17 +14,18 @@ export default function Projects() {
 
   // Fetch projects
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await api.get("/projects");
-        setProjects(res.data.projects || []); // ✅ Access projects array inside object
-      } catch (err) {
-        console.error("Failed to fetch projects", err);
-      }
-    };
+  const fetchProjects = async () => {
+    try {
+      const res = await api.get("/projects");
+      setProjects(res.data || []); // <-- array directly
+    } catch (err) {
+      console.error("Failed to fetch projects", err);
+    }
+  };
 
-    fetchProjects();
-  }, []);
+  fetchProjects();
+}, []);
+
 
   // Handle input
   const handleChange = (e) => {
