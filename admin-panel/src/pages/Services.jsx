@@ -10,17 +10,18 @@ export default function Services() {
 
   // Fetch services
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const res = await api.get("/services");
-        setServices(res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch services", err);
-      }
-    };
+  const fetchServices = async () => {
+    try {
+      const res = await api.get("/services");
+      setServices(res.data.services || []);
+    } catch (err) {
+      console.error("Failed to fetch services", err);
+      setServices([]); // safety
+    }
+  };
 
-    fetchServices();
-  }, []);
+  fetchServices();
+}, []);
 
   // Add service
   const addService = async () => {
