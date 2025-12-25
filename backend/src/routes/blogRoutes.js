@@ -31,4 +31,20 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Delete a blog
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const blog = await prisma.blog.delete({
+      where: { id: parseInt(id) }, // convert id to integer
+    });
+    res.json({ message: "Blog deleted ✅", blog });
+  } catch (err) {
+    console.error(err);
+    res.status(404).json({ error: "Blog not found ❌" });
+  }
+});
+
+
 module.exports = router;
