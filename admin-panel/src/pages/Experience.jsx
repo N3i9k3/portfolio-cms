@@ -13,18 +13,22 @@ export default function Experience() {
   const [loading, setLoading] = useState(false);
 
   // Fetch experiences
-  useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        const res = await api.get("/experience");
-        setExperiences(res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch experience", err);
-      }
-    };
+  const fetchExperiences = async () => {
+  try {
+    const res = await api.get("/experience"); // or /experiences
 
-    fetchExperiences();
-  }, []);
+    setExperiences(
+      Array.isArray(res.data)
+        ? res.data
+        : res.data.experiences || []
+    );
+
+  } catch (err) {
+    console.error("Failed to fetch experiences", err);
+    setExperiences([]); // fallback
+  }
+};
+
 
   // Handle input
   const handleChange = (e) => {
