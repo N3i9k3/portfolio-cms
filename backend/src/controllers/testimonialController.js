@@ -19,3 +19,18 @@ exports.createTestimonial = async (req, res) => {
     res.status(500).json({ message: "Failed to create testimonial" });
   }
 };
+
+// ✅ Add this
+exports.deleteTestimonial = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const testimonial = await Testimonial.findByIdAndDelete(id);
+    if (!testimonial) {
+      return res.status(404).json({ message: "Testimonial not found" });
+    }
+    res.status(200).json({ message: "Testimonial deleted ✅" });
+  } catch (error) {
+    console.error("Testimonial delete error:", error);
+    res.status(500).json({ message: "Failed to delete testimonial" });
+  }
+};

@@ -52,8 +52,9 @@ model Experience {
 }
 
 model Testimonial {
-  id   Int    @id @default(autoincrement())
-  name String
+  id      Int    @id @default(autoincrement())
+  name    String
+  message String
 }
 
 model Service {
