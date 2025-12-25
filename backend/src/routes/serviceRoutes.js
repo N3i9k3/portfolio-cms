@@ -31,4 +31,17 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Delete service
+router.delete("/:id", async (req, res) => {
+  try {
+    await prisma.service.delete({
+      where: { id: Number(req.params.id) },
+    });
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Delete service error:", err);
+    res.status(500).json({ error: "Failed to delete service" });
+  }
+});
+
 module.exports = router;

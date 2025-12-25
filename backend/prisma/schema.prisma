@@ -62,8 +62,9 @@ model Testimonial {
 }
 
 model Service {
-  id    Int    @id @default(autoincrement())
-  title String
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
 }
 
 model Media {
