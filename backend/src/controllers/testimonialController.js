@@ -1,5 +1,7 @@
+const mongoose = require("mongoose");
 const Testimonial = require("../models/Testimonial");
 
+// Get all testimonials
 exports.getTestimonials = async (req, res) => {
   try {
     const testimonials = await Testimonial.find();
@@ -10,6 +12,7 @@ exports.getTestimonials = async (req, res) => {
   }
 };
 
+// Create a testimonial
 exports.createTestimonial = async (req, res) => {
   try {
     const testimonial = await Testimonial.create(req.body);
@@ -20,9 +23,14 @@ exports.createTestimonial = async (req, res) => {
   }
 };
 
-// ✅ Add this
+// Delete a testimonial
 exports.deleteTestimonial = async (req, res) => {
   const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid testimonial ID" });
+  }
+
   try {
     const testimonial = await Testimonial.findByIdAndDelete(id);
     if (!testimonial) {
