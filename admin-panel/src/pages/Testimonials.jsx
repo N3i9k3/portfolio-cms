@@ -7,32 +7,53 @@ export default function Testimonials() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
 
+  // Fetch testimonials
   const fetchData = async () => {
-    const res = await api.get("/testimonials");
-    setItems(res.data);
+    try {
+      const res = await api.get("/testimonials");
+      setItems(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch testimonials:", err);
+    }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  // Add testimonial
   const addItem = async () => {
-    if (!name || !message) return;
-    await api.post("/testimonials", { name, message });
-    setName("");
-    setMessage("");
-    fetchData();
+    if (!name.trim() || !message.trim()) return alert("Name & message required");
+
+    try {
+      await api.post("/testimonials", { name, message });
+      setName("");
+      setMessage("");
+      fetchData();
+    } catch (err) {
+      console.error("Failed to add testimonial:", err);
+      alert("Failed to add testimonial ❌");
+    }
   };
 
-  const deleteItem = async (id) => {
-    await api.delete(`/testimonials/${id}`);
-    fetchData();
+  // Delete testimonial
+  const deleteItem = async (_id) => {
+    if (!confirm("Delete this testimonial?")) return;
+
+    try {
+      await api.delete(`/testimonials/${_id}`);
+      setItems(items.filter((t) => t._id !== _id));
+    } catch (err) {
+      console.error("Failed to delete testimonial:", err);
+      alert("Failed to delete testimonial ❌");
+    }
   };
 
   return (
     <Layout>
       <h1 className="text-2xl font-bold mb-4">Testimonials</h1>
 
+      {/* Add Testimonial */}
       <input
         className="border p-2 w-full mb-2"
         placeholder="Client name"
@@ -51,14 +72,17 @@ export default function Testimonials() {
         Add Testimonial
       </button>
 
-      <ul className="mt-6">
+      {/* Testimonial List */}
+      <ul className="mt-6 space-y-4">
+        {items.length === 0 && <p className="text-gray-500">No testimonials yet 📝</p>}
+
         {items.map((t) => (
-          <li key={t.id} className="mb-4 border-b pb-2">
+          <li key={t._id} className="border-b pb-2">
             <strong>{t.name}</strong>
             <p>{t.message}</p>
             <button
-              onClick={() => deleteItem(t.id)}
-              className="text-red-600"
+              onClick={() => deleteItem(t._id)}
+              className="text-red-600 font-bold"
             >
               Delete
             </button>
