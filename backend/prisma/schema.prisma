@@ -37,9 +37,12 @@ model Project {
 
 
 model Blog {
-  id    Int    @id @default(autoincrement())
-  title String
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
 }
+
 
 model Experience {
   id   Int    @id @default(autoincrement())
