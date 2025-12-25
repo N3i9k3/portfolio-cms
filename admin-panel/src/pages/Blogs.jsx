@@ -4,18 +4,15 @@ import Layout from "../components/Layout";
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
-  const [form, setForm] = useState({
-    title: "",
-    content: "",
-  });
+  const [form, setForm] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(false);
 
-  // Fetch blogs
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const res = await api.get("/blogs");
-        setBlogs(res.data || []);
+        console.log("Blogs API response:", res.data);
+        setBlogs(res.data.blogs || []);
       } catch (err) {
         console.error("Failed to fetch blogs", err);
       }
@@ -24,12 +21,10 @@ export default function Blogs() {
     fetchBlogs();
   }, []);
 
-  // Handle input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add blog
   const addBlog = async () => {
     if (!form.title.trim() || !form.content.trim()) {
       return alert("Title and content are required");
@@ -38,7 +33,7 @@ export default function Blogs() {
     try {
       setLoading(true);
       const res = await api.post("/blogs", form);
-      setBlogs([res.data, ...blogs]);
+      setBlogs((prev) => [res.data.blog || res.data, ...prev]);
       setForm({ title: "", content: "" });
     } catch (err) {
       alert("Failed to add blog ❌");
@@ -47,14 +42,13 @@ export default function Blogs() {
     }
   };
 
-  // Delete blog
   const deleteBlog = async (id) => {
     if (!confirm("Delete this blog?")) return;
 
     try {
       await api.delete(`/blogs/${id}`);
-      setBlogs(blogs.filter((b) => b.id !== id));
-    } catch (err) {
+      setBlogs((prev) => prev.filter((b) => b.id !== id));
+    } catch {
       alert("Failed to delete blog ❌");
     }
   };
@@ -63,7 +57,6 @@ export default function Blogs() {
     <Layout>
       <h1 className="text-2xl font-bold mb-6">Blogs</h1>
 
-      {/* Add Blog */}
       <div className="bg-white p-4 rounded shadow mb-6 space-y-3">
         <input
           name="title"
@@ -90,28 +83,31 @@ export default function Blogs() {
         </button>
       </div>
 
-      {/* Blog List */}
       <div className="space-y-4">
-        {blogs.map((blog) => (
-          <div
-            key={blog.id}
-            className="bg-white p-4 rounded shadow flex justify-between"
-          >
-            <div>
-              <h3 className="font-semibold text-lg">{blog.title}</h3>
-              <p className="text-gray-600 text-sm line-clamp-3">
-                {blog.content}
-              </p>
-            </div>
-
-            <button
-              onClick={() => deleteBlog(blog.id)}
-              className="text-red-600 font-bold"
+        {blogs.length === 0 ? (
+          <p className="text-gray-500 text-center">No blogs yet 📝</p>
+        ) : (
+          blogs.map((blog) => (
+            <div
+              key={blog.id}
+              className="bg-white p-4 rounded shadow flex justify-between"
             >
-              ✕
-            </button>
-          </div>
-        ))}
+              <div>
+                <h3 className="font-semibold text-lg">{blog.title}</h3>
+                <p className="text-gray-600 text-sm line-clamp-3">
+                  {blog.content}
+                </p>
+              </div>
+
+              <button
+                onClick={() => deleteBlog(blog.id)}
+                className="text-red-600 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+          ))
+        )}
       </div>
     </Layout>
   );
