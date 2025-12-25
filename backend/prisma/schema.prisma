@@ -47,12 +47,12 @@ model Blog {
 
 
 model Experience {
-  id          Int    @id @default(autoincrement())
-  role        String
-  company     String
-  duration    String
-  description String
+  id       Int    @id @default(autoincrement())
+  role     String
+  company  String
+  duration String
 }
+
 
 
 model Testimonial {
