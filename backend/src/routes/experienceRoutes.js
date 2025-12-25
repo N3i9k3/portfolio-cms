@@ -31,4 +31,21 @@ router.post("/", async (req, res) => {
   }
 });
 
+
+// ✅ DELETE experience
+router.delete("/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    await prisma.experience.delete({
+      where: { id },
+    });
+
+    res.json({ message: "Experience deleted ✅" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete experience" });
+  }
+}); 
+
 module.exports = router;
