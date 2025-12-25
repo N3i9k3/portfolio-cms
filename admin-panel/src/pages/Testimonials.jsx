@@ -8,14 +8,17 @@ export default function Testimonials() {
   const [message, setMessage] = useState("");
 
   // Fetch testimonials
-  const fetchData = async () => {
-    try {
-      const res = await api.get("/testimonials");
-      setItems(res.data || []);
-    } catch (err) {
-      console.error("Failed to fetch testimonials:", err);
-    }
-  };
+ const fetchData = async () => {
+  try {
+    const res = await api.get("/testimonials");
+    // Make sure to use the correct key
+    setItems(Array.isArray(res.data) ? res.data : res.data.testimonials || []);
+  } catch (err) {
+    console.error("Failed to fetch testimonials:", err);
+    setItems([]); // fallback
+  }
+};
+
 
   useEffect(() => {
     fetchData();
