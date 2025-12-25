@@ -47,9 +47,13 @@ model Blog {
 
 
 model Experience {
-  id   Int    @id @default(autoincrement())
-  role String
+  id          Int    @id @default(autoincrement())
+  role        String
+  company     String
+  duration    String
+  description String
 }
+
 
 model Testimonial {
   id      Int    @id @default(autoincrement())
